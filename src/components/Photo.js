@@ -1,10 +1,10 @@
 import React from "react";
 
-function Photo({ images }) {
+function Photo({ reg }) {
   return (
-    <a href={images.url}>
-      <img src={images.reg} />
-    </a>
+    <figure className="photo" id="photo">
+      <img src={reg} alt={"photo"} />
+    </figure>
   );
 }
 

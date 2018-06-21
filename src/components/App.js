@@ -16,13 +16,12 @@ class App extends React.Component {
       id: "asdad",
       thumb: "mrwoof.jpg",
       reg: "images[0]",
-      credit: "my dad",
-      mainImage: "images[0]"
+      credit: "I took it"
     };
 
     this.getWeather = this.getWeather.bind(this);
     this.getPhoto = this.getPhoto.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
     this.receiver = this.receiver.bind(this);
   }
 
@@ -42,20 +41,22 @@ class App extends React.Component {
           description: data.weather[0].description,
           current: data.main.temp
         });
-        // console.log("Inside Weather fetch this.state ", this.state);
+        this.getPhoto(this.state.description);
+
       });
   }
 
-  getPhoto(cloudy) {
+  getPhoto(description) {
     const {
       config: {
         api: { weather, unsplash }
       }
     } = this.props;
 
-    let openSplash = `${unsplash.url}?query=${cloudy}&client_id=${
+    let openSplash = `${unsplash.url}?query=${description}&client_id=${
       unsplash.apiKey
-    }`;
+      }`;
+
 
     fetch(openSplash)
       .then(response => response.json())
@@ -69,45 +70,43 @@ class App extends React.Component {
             url: item.links.html
           }))
         });
-        console.log("images test", this.state);
+
       });
+
   }
 
-  receiver(value) {
+  receiver(name, value) {
+
     this.setState({
-      city: value
+      [name]: value
     });
+
   }
 
-  receiveImage(value) {
-    console.log(value);
-    // this.setState({
-    //   mainImage: value
-    // });
-  }
-
-  handleSubmit(event) {
+  onSubmit(name, value) {
     event.preventDefault();
-    // this.getWeather(event.target.value);
-    this.getPhoto(this.getWeather(event.target.value));
+    this.setState({ [name]: value });
 
-    // console.log("image fetch", this.getPhoto("cloudy"));
+
+    this.getWeather(this.state.city);
+
   }
-  // Fetch photos using weather description
-  // Send photos to thumbnail
-  // Display main photo
-  // Display credit & weather description within Info
 
   render() {
-    // console.log("city", this.state.city);
 
     return (
-      <div className="App">
+      <div className="content">
         <header className="header">
-          <h2>Mini Weather App</h2>
+          <h1 className="title">
+            <i>Meteor</i>
+            <i>oplis</i>
+          </h1>
         </header>
 
-        <Photo images={this.state.images} />
+        <Photo
+          reg={this.state.reg}
+          credit={this.state.credit}
+        />
 
         <Info
           description={this.state.description}
@@ -118,18 +117,18 @@ class App extends React.Component {
         <Thumbs
           images={this.state.images}
           description={this.state.description}
-          receiveImage={this.receiveImage}
+          receiver={this.receiver}
           onClick={this.showMain}
         />
 
         <Search
           receiver={this.receiver}
           value={this.state.city}
-          handleSubmit={this.handleSubmit}
+          onSubmit={this.onSubmit}
         />
-      </div>
+      </div >
     );
   }
 }
-// App.defaultProps = {};
+
 export default App;
