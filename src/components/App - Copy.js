@@ -1,60 +1,131 @@
 import React from "react";
-// import Photo from "./Photo";
-// import Info from "./Info";
-// import Thumbs from "./Thumbs";
-// import Search from "./Search";
+import Photo from "./Photo";
+import Info from "./Info";
+import Thumbs from "./Thumbs";
+import Search from "./Search";
 
 class App extends React.Component {
   constructor() {
     super();
 
     this.state = {
-      city: "",
+      city: "London",
       description: "",
-      current: "", //to do
-      credit: "",
-      searchInput: ""
-    }
+      current: "",
+      images: [],
+      id: "asdad",
+      thumb: "mrwoof.jpg",
+      reg: "ssdd",
+      credit: "my dad",
+      mainImage: ""
+    };
 
     this.getWeather = this.getWeather.bind(this);
-
+    this.getPhoto = this.getPhoto.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.receiver = this.receiver.bind(this);
   }
 
-  // Fetch weather using index.js props
   getWeather(city) {
-    const { config: { api: { weather, unsplash } } } = this.props
+    const {
+      config: {
+        api: { weather, unsplash }
+      }
+    } = this.props;
 
-    // Fetch to return object containing relevant weather data
+    let openUrl = `${weather.url}?q=${this.state.city}&APPID=${weather.apiKey}`;
 
-    const openUrl = `${weather.url}?q=${city}&APPID=${weather.apiKey}`;
     fetch(openUrl)
       .then(response => response.json())
       .then(data => {
-        console.log(data)
-        this.setState({ description: data.weather[0].description })
-      })
+        this.setState({
+          description: data.weather[0].description,
+          current: data.main.temp
+        });
+        // console.log("Inside Weather fetch this.state ", this.state);
+      });
   }
 
+  getPhoto(cloudy) {
+    const {
+      config: {
+        api: { weather, unsplash }
+      }
+    } = this.props;
 
+    let openSplash = `${unsplash.url}?query=${cloudy}&client_id=${
+      unsplash.apiKey
+    }`;
+
+    fetch(openSplash)
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          images: data.results.map(item => ({
+            id: item.id,
+            thumb: item.urls.thumb,
+            reg: item.urls.regular,
+            credit: item.user.name,
+            url: item.links.html
+          }))
+        });
+        console.log("images test", this.state);
+      });
+  }
+
+  receiver(value) {
+    this.setState({
+      city: value
+    });
+  }
+
+  receiveImage(value) {
+    this.setState({
+      mainImage: value
+    });
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    // this.getWeather(event.target.value);
+    this.getPhoto(this.getWeather(event.target.value));
+
+    // console.log("image fetch", this.getPhoto("cloudy"));
+  }
   // Fetch photos using weather description
   // Send photos to thumbnail
   // Display main photo
   // Display credit & weather description within Info
 
-
   render() {
+    // console.log("city", this.state.city);
 
     return (
-      <div className='App'>
-        {/* <Photo />
-        <Info />
-        <Thumbs />
-        <Search /> */}
+      <div className="App">
+        <header className="header">
+          <h2>Mini Weather App</h2>
+        </header>
+
+        <Photo mainImage={this.state.mainImage} />
+
+        <Info
+          description={this.state.description}
+          current={this.state.current}
+          credit={this.state.credit}
+        />
+
+        <Thumbs
+          images={this.state.images}
+          description={this.state.description}
+          receiveImage={this.receiveImage}
+        />
+
+        <form onSubmit={this.handleSubmit}>
+          <Search receiver={this.receiver} value={this.state.city} />
+        </form>
       </div>
     );
   }
 }
-
-App.defaultProps = {};
-
+// App.defaultProps = {};
 export default App;

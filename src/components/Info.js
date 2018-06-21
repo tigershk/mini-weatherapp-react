@@ -1,16 +1,18 @@
 import React from "react";
+import PropTypes from "prop-types";
 
-function Info({description, current}) {
+function Info({ description, current, credit }) {
+  const currentTemperature = Math.round(current - 273.15);
 
+  return (
+    <div>
+      {description} {currentTemperature} {credit}
+    </div>
+  );
 }
 
-  
-
-  render() {
-    return "hello world!";
-  }
-
-
-Info.defaultProps = {};
+// Info.propTypes = {
+//   description: PropTypes.string
+// };
 
 export default Info;

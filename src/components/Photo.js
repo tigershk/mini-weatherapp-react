@@ -1,16 +1,11 @@
 import React from "react";
 
-class Photo extends React.Component {
-  constructor(props) {
-    super();
-
-  }
-
-  render() {
-    return "hello world!";
-  }
+function Photo({ images }) {
+  return (
+    <a href={images.url}>
+      <img src={images.reg} />
+    </a>
+  );
 }
-
-Photo.defaultProps = {};
 
 export default Photo;

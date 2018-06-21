@@ -1,16 +1,25 @@
 import React from "react";
+import Thumb from "./Thumb";
 
-class Photo extends React.Component {
-  constructor(props) {
-    super();
+function Thumbs({ images, description, receiveImage }) {
+  console.log("Inside Thumbs Component", { images });
 
-  }
-
-  render() {
-    return "hello world!";
-  }
+  return (
+    <div className="thumbs">
+      {images.map(image => {
+        return (
+          <Thumb
+            receiveImage={receiveImage}
+            key={image.id}
+            image={image}
+            description={description}
+          />
+        );
+      })}
+    </div>
+  );
 }
 
-Photo.defaultProps = {};
+Thumbs.defaultProps = {};
 
-export default Photo;
+export default Thumbs;

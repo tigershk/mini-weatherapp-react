@@ -1,7 +1,7 @@
 import React from "react";
-// import Photo from "./Photo";
-// import Info from "./Info";
-// import Thumbs from "./Thumbs";
+import Photo from "./Photo";
+import Info from "./Info";
+import Thumbs from "./Thumbs";
 import Search from "./Search";
 
 class App extends React.Component {
@@ -12,14 +12,20 @@ class App extends React.Component {
       city: "London",
       description: "",
       current: "",
-      credit: ""
+      images: [],
+      id: "asdad",
+      thumb: "mrwoof.jpg",
+      reg: "images[0]",
+      credit: "my dad",
+      mainImage: "images[0]"
     };
+
     this.getWeather = this.getWeather.bind(this);
+    this.getPhoto = this.getPhoto.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.receiver = this.receiver.bind(this);
   }
 
-  // Fetch weather using index.js props
   getWeather(city) {
     const {
       config: {
@@ -28,26 +34,64 @@ class App extends React.Component {
     } = this.props;
 
     let openUrl = `${weather.url}?q=${this.state.city}&APPID=${weather.apiKey}`;
-    console.log(openUrl);
+
     fetch(openUrl)
       .then(response => response.json())
       .then(data => {
-        console.log("Inside Fetch ", data);
         this.setState({
           description: data.weather[0].description,
           current: data.main.temp
         });
+        // console.log("Inside Weather fetch this.state ", this.state);
+      });
+  }
+
+  getPhoto(cloudy) {
+    const {
+      config: {
+        api: { weather, unsplash }
+      }
+    } = this.props;
+
+    let openSplash = `${unsplash.url}?query=${cloudy}&client_id=${
+      unsplash.apiKey
+    }`;
+
+    fetch(openSplash)
+      .then(response => response.json())
+      .then(data => {
+        this.setState({
+          images: data.results.map(item => ({
+            id: item.id,
+            thumb: item.urls.thumb,
+            reg: item.urls.regular,
+            credit: item.user.name,
+            url: item.links.html
+          }))
+        });
+        console.log("images test", this.state);
       });
   }
 
   receiver(value) {
-    this.setState({ city: value });
-    // console.log("State is currently: ", this.state);
+    this.setState({
+      city: value
+    });
+  }
+
+  receiveImage(value) {
+    console.log(value);
+    // this.setState({
+    //   mainImage: value
+    // });
   }
 
   handleSubmit(event) {
     event.preventDefault();
-    console.log(this.getWeather(event.target.value));
+    // this.getWeather(event.target.value);
+    this.getPhoto(this.getWeather(event.target.value));
+
+    // console.log("image fetch", this.getPhoto("cloudy"));
   }
   // Fetch photos using weather description
   // Send photos to thumbnail
@@ -62,9 +106,27 @@ class App extends React.Component {
         <header className="header">
           <h2>Mini Weather App</h2>
         </header>
-        <form onSubmit={this.handleSubmit}>
-          <Search receiver={this.receiver} value={this.state.city} />
-        </form>
+
+        <Photo images={this.state.images} />
+
+        <Info
+          description={this.state.description}
+          current={this.state.current}
+          credit={this.state.credit}
+        />
+
+        <Thumbs
+          images={this.state.images}
+          description={this.state.description}
+          receiveImage={this.receiveImage}
+          onClick={this.showMain}
+        />
+
+        <Search
+          receiver={this.receiver}
+          value={this.state.city}
+          handleSubmit={this.handleSubmit}
+        />
       </div>
     );
   }
